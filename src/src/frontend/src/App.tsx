@@ -13,6 +13,7 @@ import { CheckoutPage } from './pages/CheckoutPage';
 import { SuccessPage } from './pages/SuccessPage';
 import { CancelPage } from './pages/CancelPage';
 import { AdminPage } from './pages/AdminPage';
+import { ProfilePage } from './pages/ProfilePage';
 
 // Root route with layout
 const rootRoute = createRootRoute({
@@ -76,6 +77,12 @@ const adminRoute = createRoute({
   component: AdminPage,
 });
 
+const profileRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/profile',
+  component: ProfilePage,
+});
+
 // Create route tree
 const routeTree = rootRoute.addChildren([
   indexRoute,
@@ -86,6 +93,7 @@ const routeTree = rootRoute.addChildren([
   successRoute,
   cancelRoute,
   adminRoute,
+  profileRoute,
 ]);
 
 // Create router

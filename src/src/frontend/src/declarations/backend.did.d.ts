@@ -1,4 +1,4 @@
- 
+/* eslint-disable */
 
 // @ts-nocheck
 
@@ -23,6 +23,14 @@ export interface Product {
   'reviewCount' : bigint,
   'images' : Array<ExternalBlob>,
 }
+export interface ProfileData {
+  'principal' : Principal,
+  'fullName' : string,
+  'email' : string,
+  'address' : string,
+  'phone' : string,
+  'registered' : Time,
+}
 export interface ShoppingItem {
   'productName' : string,
   'currency' : string,
@@ -38,6 +46,7 @@ export type StripeSessionStatus = {
     'completed' : { 'userPrincipal' : [] | [string], 'response' : string }
   } |
   { 'failed' : { 'error' : string } };
+export type Time = bigint;
 export interface TransformationInput {
   'context' : Uint8Array,
   'response' : http_request_result,
@@ -94,6 +103,7 @@ export interface _SERVICE {
   'getAllProducts' : ActorMethod<[], Array<Product>>,
   'getBestsellers' : ActorMethod<[], Array<Product>>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
+  'getMyContactInfo' : ActorMethod<[], [] | [ProfileData]>,
   'getProduct' : ActorMethod<[string], Product>,
   'getProductsByCategory' : ActorMethod<[string], Array<Product>>,
   'getProductsByPriceRange' : ActorMethod<[bigint, bigint], Array<Product>>,
@@ -101,6 +111,11 @@ export interface _SERVICE {
   'getTopRatedProducts' : ActorMethod<[], Array<Product>>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'isStripeConfigured' : ActorMethod<[], boolean>,
+  'listAllUserContacts' : ActorMethod<[], Array<ProfileData>>,
+  'saveMyContactInfo' : ActorMethod<
+    [string, string, string, string],
+    undefined
+  >,
   'setStripeConfiguration' : ActorMethod<[StripeConfiguration], undefined>,
   'transform' : ActorMethod<[TransformationInput], TransformationOutput>,
   'updateProduct' : ActorMethod<[Product], undefined>,

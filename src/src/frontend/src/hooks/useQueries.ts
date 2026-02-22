@@ -1,6 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
-import { Product, UserRole, StripeConfiguration, ShoppingItem } from '../backend';
+import { Product, UserRole, StripeConfiguration, ShoppingItem, ProfileData } from '../backend';
 
 // Product Queries
 export function useGetAllProducts() {
@@ -135,6 +135,7 @@ export function useDeleteProduct() {
 // Authorization Queries
 export function useGetCallerUserRole() {
   const { actor, isFetching } = useActor();
+  
   return useQuery<UserRole>({
     queryKey: ['userRole'],
     queryFn: async () => {
@@ -142,11 +143,13 @@ export function useGetCallerUserRole() {
       return actor.getCallerUserRole();
     },
     enabled: !!actor && !isFetching,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 }
 
 export function useIsCallerAdmin() {
   const { actor, isFetching } = useActor();
+  
   return useQuery<boolean>({
     queryKey: ['isAdmin'],
     queryFn: async () => {
@@ -154,6 +157,7 @@ export function useIsCallerAdmin() {
       return actor.isCallerAdmin();
     },
     enabled: !!actor && !isFetching,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
   });
 }
 
@@ -218,5 +222,46 @@ export function useGetStripeSessionStatus(sessionId: string | null) {
       return actor.getStripeSessionStatus(sessionId);
     },
     enabled: !!actor && !isFetching && !!sessionId,
+  });
+}
+
+// Profile Queries & Mutations
+export function useGetMyContactInfo() {
+  const { actor, isFetching } = useActor();
+  return useQuery<ProfileData | null>({
+    queryKey: ['myContactInfo'],
+    queryFn: async () => {
+      if (!actor) return null;
+      return actor.getMyContactInfo();
+    },
+    enabled: !!actor && !isFetching,
+  });
+}
+
+export function useSaveMyContactInfo() {
+  const { actor } = useActor();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (data: { email: string; name: string; phone: string; address: string }) => {
+      if (!actor) throw new Error('Actor not available');
+      return actor.saveMyContactInfo(data.email, data.name, data.phone, data.address);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['myContactInfo'] });
+      queryClient.invalidateQueries({ queryKey: ['allUserContacts'] });
+    },
+  });
+}
+
+export function useListAllUserContacts() {
+  const { actor, isFetching } = useActor();
+  return useQuery<ProfileData[]>({
+    queryKey: ['allUserContacts'],
+    queryFn: async () => {
+      if (!actor) return [];
+      return actor.listAllUserContacts();
+    },
+    enabled: !!actor && !isFetching,
   });
 }

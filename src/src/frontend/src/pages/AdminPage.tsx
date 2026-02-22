@@ -8,6 +8,7 @@ import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ProductsAdmin } from '../components/admin/ProductsAdmin';
 import { StripeConfigAdmin } from '../components/admin/StripeConfigAdmin';
+import { UserDatabaseAdmin } from '../components/admin/UserDatabaseAdmin';
 import { Button } from '@/components/ui/button';
 
 export function AdminPage() {
@@ -62,7 +63,7 @@ export function AdminPage() {
     <div className="min-h-screen py-8 px-4">
       <div className="container mx-auto max-w-7xl">
         {/* Prominent Admin Status Banner */}
-        <Alert className="mb-8 border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30">
+        <Alert className="mb-6 border-2 border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30">
           <CheckCircle2 className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
           <AlertDescription className="text-base font-semibold text-emerald-900 dark:text-emerald-100 flex items-center gap-2">
             <Crown className="h-5 w-5 text-amber-500" />
@@ -77,19 +78,24 @@ export function AdminPage() {
 
         <Alert className="mb-6">
           <AlertDescription>
-            Welcome to the admin dashboard. Here you can manage products and configure payment
+            Welcome to the admin dashboard. Here you can manage products, view registered users, and configure payment
             settings.
           </AlertDescription>
         </Alert>
 
         <Tabs defaultValue="products" className="w-full">
-          <TabsList className="grid w-full max-w-md grid-cols-2">
+          <TabsList className="grid w-full max-w-2xl grid-cols-3">
             <TabsTrigger value="products">Products</TabsTrigger>
+            <TabsTrigger value="users">User Database</TabsTrigger>
             <TabsTrigger value="stripe">Stripe Config</TabsTrigger>
           </TabsList>
 
           <TabsContent value="products" className="mt-6">
             <ProductsAdmin />
+          </TabsContent>
+
+          <TabsContent value="users" className="mt-6">
+            <UserDatabaseAdmin />
           </TabsContent>
 
           <TabsContent value="stripe" className="mt-6">

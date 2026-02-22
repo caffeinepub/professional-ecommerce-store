@@ -1,8 +1,8 @@
 import Map "mo:core/Map";
-import Time "mo:core/Time";
-import Array "mo:core/Array";
-import Iter "mo:core/Iter";
+import Nat "mo:core/Nat";
 import Text "mo:core/Text";
+import Iter "mo:core/Iter";
+import Array "mo:core/Array";
 import Principal "mo:core/Principal";
 import List "mo:core/List";
 import Set "mo:core/Set";
@@ -14,6 +14,7 @@ import AccessControl "authorization/access-control";
 import MixinStorage "blob-storage/Mixin";
 import MixinAuthorization "authorization/MixinAuthorization";
 import Runtime "mo:core/Runtime";
+import Time "mo:core/Time";
 
 actor {
   // Initialize mixins
@@ -31,6 +32,15 @@ actor {
   };
 
   public type FileReference = { file : Storage.ExternalBlob };
+
+  public type ProfileData = {
+    principal : Principal;
+    email : Text;
+    fullName : Text;
+    phone : Text;
+    address : Text;
+    registered : Time.Time;
+  };
 
   public type Product = {
     id : Text;
@@ -98,6 +108,7 @@ actor {
   let storeSettings = Map.empty<Text, StoreSettings>();
   let stripeSettings = Map.empty<Text, Stripe.StripeConfiguration>();
   let abandonedCarts = Map.empty<Principal, Cart>();
+  let profiles = Map.empty<Principal, ProfileData>();
 
   func ensureUser(_ : Principal, userId : Principal) {
     switch (userProfiles.get(userId)) {
@@ -151,6 +162,33 @@ actor {
 
   public shared ({ caller }) func createCheckoutSession(items : [Stripe.ShoppingItem], successUrl : Text, cancelUrl : Text) : async Text {
     await Stripe.createCheckoutSession(getStripeConfiguration(), caller, items, successUrl, cancelUrl, transform);
+  };
+
+  // Contact Info
+  public shared ({ caller }) func saveMyContactInfo(email : Text, name : Text, phone : Text, address : Text) : async () {
+    if (email == "") {
+      Runtime.trap("Email address is required");
+    };
+
+    let newRecord : ProfileData = {
+      principal = caller;
+      email;
+      fullName = name;
+      phone;
+      address;
+      registered = Time.now();
+    };
+
+    profiles.add(caller, newRecord);
+  };
+
+  public query ({ caller }) func getMyContactInfo() : async ?ProfileData {
+    profiles.get(caller);
+  };
+
+  public query ({ caller }) func listAllUserContacts() : async [ProfileData] {
+    ensureAdmin(caller, caller);
+    profiles.values().toArray();
   };
 
   // Product management

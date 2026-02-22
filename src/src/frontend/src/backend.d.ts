@@ -14,23 +14,25 @@ export class ExternalBlob {
     static fromBytes(blob: Uint8Array<ArrayBuffer>): ExternalBlob;
     withUploadProgress(onProgress: (percentage: number) => void): ExternalBlob;
 }
+export interface TransformationOutput {
+    status: bigint;
+    body: Uint8Array;
+    headers: Array<http_header>;
+}
+export type Time = bigint;
+export interface ProfileData {
+    principal: Principal;
+    fullName: string;
+    email: string;
+    address: string;
+    phone: string;
+    registered: Time;
+}
 export interface http_header {
     value: string;
     name: string;
 }
-export interface Product {
-    id: string;
-    name: string;
-    ratings: Array<bigint>;
-    description: string;
-    stock: bigint;
-    purchases: bigint;
-    category: string;
-    price: bigint;
-    reviewCount: bigint;
-    images: Array<ExternalBlob>;
-}
-export interface TransformationOutput {
+export interface http_request_result {
     status: bigint;
     body: Uint8Array;
     headers: Array<http_header>;
@@ -62,10 +64,17 @@ export interface StripeConfiguration {
     allowedCountries: Array<string>;
     secretKey: string;
 }
-export interface http_request_result {
-    status: bigint;
-    body: Uint8Array;
-    headers: Array<http_header>;
+export interface Product {
+    id: string;
+    name: string;
+    ratings: Array<bigint>;
+    description: string;
+    stock: bigint;
+    purchases: bigint;
+    category: string;
+    price: bigint;
+    reviewCount: bigint;
+    images: Array<ExternalBlob>;
 }
 export enum UserRole {
     admin = "admin",
@@ -80,6 +89,7 @@ export interface backendInterface {
     getAllProducts(): Promise<Array<Product>>;
     getBestsellers(): Promise<Array<Product>>;
     getCallerUserRole(): Promise<UserRole>;
+    getMyContactInfo(): Promise<ProfileData | null>;
     getProduct(productId: string): Promise<Product>;
     getProductsByCategory(category: string): Promise<Array<Product>>;
     getProductsByPriceRange(minPrice: bigint, maxPrice: bigint): Promise<Array<Product>>;
@@ -87,6 +97,8 @@ export interface backendInterface {
     getTopRatedProducts(): Promise<Array<Product>>;
     isCallerAdmin(): Promise<boolean>;
     isStripeConfigured(): Promise<boolean>;
+    listAllUserContacts(): Promise<Array<ProfileData>>;
+    saveMyContactInfo(email: string, name: string, phone: string, address: string): Promise<void>;
     setStripeConfiguration(config: StripeConfiguration): Promise<void>;
     transform(input: TransformationInput): Promise<TransformationOutput>;
     updateProduct(product: Product): Promise<void>;

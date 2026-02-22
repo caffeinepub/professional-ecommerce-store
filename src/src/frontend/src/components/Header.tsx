@@ -1,8 +1,15 @@
 import React from 'react';
 import { Link } from '@tanstack/react-router';
-import { ShoppingCart, User, Store, Crown } from 'lucide-react';
+import { ShoppingCart, User, Store, Crown, UserCircle, LogOut, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useCart } from '../contexts/CartContext';
 import { useGetCallerUserRole } from '../hooks/useQueries';
@@ -12,11 +19,18 @@ import { useQueryClient } from '@tanstack/react-query';
 export function Header() {
   const { login, clear, loginStatus, identity } = useInternetIdentity();
   const { totalItems } = useCart();
-  const { data: userRole } = useGetCallerUserRole();
+  const { data: userRole, refetch: refetchUserRole } = useGetCallerUserRole();
   const queryClient = useQueryClient();
 
   const isAuthenticated = !!identity;
   const isLoggingIn = loginStatus === 'logging-in';
+
+  // Refetch user role when login succeeds
+  React.useEffect(() => {
+    if (loginStatus === 'success' && identity) {
+      refetchUserRole();
+    }
+  }, [loginStatus, identity, refetchUserRole]);
 
   const handleAuth = async () => {
     if (isAuthenticated) {
@@ -80,15 +94,44 @@ export function Header() {
               )}
             </Button>
           </Link>
-          <Button
-            onClick={handleAuth}
-            disabled={isLoggingIn}
-            variant={isAuthenticated ? 'outline' : 'default'}
-            size="sm"
-          >
-            <User className="mr-2 h-4 w-4" />
-            {isLoggingIn ? 'Logging in...' : isAuthenticated ? 'Logout' : 'Login'}
-          </Button>
+
+          {isAuthenticated ? (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="gap-2">
+                  <User className="h-4 w-4" />
+                  Account
+                  <ChevronDown className="h-3 w-3 opacity-50" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuItem asChild>
+                  <Link to="/profile" className="cursor-pointer flex items-center">
+                    <UserCircle className="mr-2 h-4 w-4" />
+                    My Profile
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  onClick={handleAuth}
+                  className="cursor-pointer text-destructive focus:text-destructive"
+                >
+                  <LogOut className="mr-2 h-4 w-4" />
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Button
+              onClick={handleAuth}
+              disabled={isLoggingIn}
+              variant="default"
+              size="sm"
+            >
+              <User className="mr-2 h-4 w-4" />
+              {isLoggingIn ? 'Logging in...' : 'Login'}
+            </Button>
+          )}
         </div>
       </div>
     </header>

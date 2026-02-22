@@ -1,4 +1,4 @@
- 
+/* eslint-disable */
 
 // @ts-nocheck
 
@@ -43,6 +43,15 @@ export const ShoppingItem = IDL.Record({
   'quantity' : IDL.Nat,
   'priceInCents' : IDL.Nat,
   'productDescription' : IDL.Text,
+});
+export const Time = IDL.Int;
+export const ProfileData = IDL.Record({
+  'principal' : IDL.Principal,
+  'fullName' : IDL.Text,
+  'email' : IDL.Text,
+  'address' : IDL.Text,
+  'phone' : IDL.Text,
+  'registered' : Time,
 });
 export const StripeSessionStatus = IDL.Variant({
   'completed' : IDL.Record({
@@ -113,6 +122,7 @@ export const idlService = IDL.Service({
   'getAllProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
   'getBestsellers' : IDL.Func([], [IDL.Vec(Product)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+  'getMyContactInfo' : IDL.Func([], [IDL.Opt(ProfileData)], ['query']),
   'getProduct' : IDL.Func([IDL.Text], [Product], ['query']),
   'getProductsByCategory' : IDL.Func([IDL.Text], [IDL.Vec(Product)], ['query']),
   'getProductsByPriceRange' : IDL.Func(
@@ -124,6 +134,12 @@ export const idlService = IDL.Service({
   'getTopRatedProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'isStripeConfigured' : IDL.Func([], [IDL.Bool], ['query']),
+  'listAllUserContacts' : IDL.Func([], [IDL.Vec(ProfileData)], ['query']),
+  'saveMyContactInfo' : IDL.Func(
+      [IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+      [],
+      [],
+    ),
   'setStripeConfiguration' : IDL.Func([StripeConfiguration], [], []),
   'transform' : IDL.Func(
       [TransformationInput],
@@ -171,6 +187,15 @@ export const idlFactory = ({ IDL }) => {
     'quantity' : IDL.Nat,
     'priceInCents' : IDL.Nat,
     'productDescription' : IDL.Text,
+  });
+  const Time = IDL.Int;
+  const ProfileData = IDL.Record({
+    'principal' : IDL.Principal,
+    'fullName' : IDL.Text,
+    'email' : IDL.Text,
+    'address' : IDL.Text,
+    'phone' : IDL.Text,
+    'registered' : Time,
   });
   const StripeSessionStatus = IDL.Variant({
     'completed' : IDL.Record({
@@ -238,6 +263,7 @@ export const idlFactory = ({ IDL }) => {
     'getAllProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
     'getBestsellers' : IDL.Func([], [IDL.Vec(Product)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
+    'getMyContactInfo' : IDL.Func([], [IDL.Opt(ProfileData)], ['query']),
     'getProduct' : IDL.Func([IDL.Text], [Product], ['query']),
     'getProductsByCategory' : IDL.Func(
         [IDL.Text],
@@ -253,6 +279,12 @@ export const idlFactory = ({ IDL }) => {
     'getTopRatedProducts' : IDL.Func([], [IDL.Vec(Product)], ['query']),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'isStripeConfigured' : IDL.Func([], [IDL.Bool], ['query']),
+    'listAllUserContacts' : IDL.Func([], [IDL.Vec(ProfileData)], ['query']),
+    'saveMyContactInfo' : IDL.Func(
+        [IDL.Text, IDL.Text, IDL.Text, IDL.Text],
+        [],
+        [],
+      ),
     'setStripeConfiguration' : IDL.Func([StripeConfiguration], [], []),
     'transform' : IDL.Func(
         [TransformationInput],
